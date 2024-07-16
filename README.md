@@ -1,39 +1,35 @@
-User Authentication System
+# User Authentication System
 
 A simple user authentication and authorization system using Node.js, Express, Mongoose, bcrypt, and JWT.
-Features
 
-    User registration with hashed passwords
-    User login with JWT generation
-    Protected routes for authenticated users
+## Features
+- User registration with hashed passwords
+- User login with JWT generation
+- Protected routes for authenticated users
 
-Technologies Used
+## Technologies Used
+- **Node.js**
+- **Express**
+- **Mongoose**
+- **bcrypt**
+- **jsonwebtoken**
+- **dotenv**
 
-    Node.js
-    Express
-    Mongoose
-    bcrypt
-    jsonwebtoken
-    dotenv
+## Getting Started
 
-Getting Started
-Prerequisites
+### Prerequisites
+- Node.js
+- MongoDB (local or Atlas)
 
-    Node.js
-    MongoDB (local or Atlas)
+### Installation
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/yourusername/repo-name.git
+   cd repo-name
 
-Installation
-
-    Clone the repo:
+    Install dependencies:
 
     bash
-
-git clone https://github.com/yourusername/repo-name.git
-cd repo-name
-
-Install dependencies:
-
-bash
 
 npm install
 
