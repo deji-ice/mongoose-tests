@@ -7,14 +7,14 @@ export const verifyJWToken = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         status: "error",
-        message: "Unauthorized :(",
+        message: "Unauthorized ☹️",
       });
     }
     const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
     if (!decoded) {
       return res.status(401).json({
         status: "error",
-        message: "Unauthorized :(",
+        message: "Unauthorized ☹️",
       });
     }
 
