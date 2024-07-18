@@ -4,20 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mongo</title>
+    <script src="./signUp.js" defer></script>
     <script src="http://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gradient-to-b from-[#FFA334] flex flex-col items-center justify-center to-[#FF7213]">
+  <body
+    class="bg-gradient-to-b from-[#FFA334] flex flex-col items-center justify-center to-[#FF7213]"
+  >
     <h1 class="text-2xl font-bold text-center">Register Page</h1>
     <form
       action=""
-      class="bg-white md:p-[5rem] rounded-lg p-[2rem] w-1/2  mt-8 mx-2 "
+      id="signUpForm"
+      class="bg-white md:p-[5rem] rounded-lg p-[2rem] w-1/2 mt-8 mx-2"
     >
       <!-- register page -->
       <div class="flex flex-col">
-        <label class="mb-2 font-semibold text-xl" for="">Name</label>
+        <label class="mb-2 font-semibold text-xl" for="">First Name</label>
         <input
           class="w-full rounded-xl mb-4 px-8 pb-2 border-4 border-[#FFA334] pt-2 outline-none"
           type="text"
+          id="firstName"
+        />
+      </div>
+      <div class="flex flex-col">
+        <label class="mb-2 font-semibold text-xl" for="">Last Name</label>
+        <input
+          class="w-full rounded-xl mb-4 px-8 pb-2 border-4 border-[#FFA334] pt-2 outline-none"
+          type="text"
+          id="lastName"
         />
       </div>
       <div class="flex flex-col">
@@ -25,6 +38,7 @@
         <input
           class="w-full rounded-xl mb-4 px-8 pb-2 border-4 border-[#FFA334] pt-2 outline-none"
           type="text"
+          id="userName"
         />
       </div>
       <div class="flex flex-col">
@@ -32,6 +46,7 @@
         <input
           class="w-full rounded-xl mb-4 px-8 pb-2 border-4 border-[#FFA334] pt-4 outline-none"
           type="email"
+          id="email"
         />
       </div>
       <div class="flex flex-col">
@@ -39,6 +54,7 @@
         <input
           class="w-full rounded-xl mb-4 px-8 pb-2 border-4 border-[#FFA334] pt-4 outline-none"
           type="password"
+          id="password"
         />
       </div>
       <div class="flex flex-col">
@@ -48,10 +64,12 @@
         <input
           class="w-full rounded-xl px-8 pb-2 border-4 border-[#FFA334] pt-4 outline-none"
           type="password"
+          id="confirmPassword"
         />
       </div>
       <div class="flex flex-col items-center">
         <button
+          type="submit"
           class="bg-[#FF7213] mb-[10px] hover:bg-slate-400 mt-[3rem] w-[15rem] py-4 rounded-full"
         >
           Register
