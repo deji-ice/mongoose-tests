@@ -5,6 +5,9 @@ console.log(form, typeof form);
 const formData = () => {
   const { firstName, lastName, email, password, userName, confirmPassword } =
     form;
+  if (password === confirmPassword) {
+    return alert("Passwords do not match");
+  }
 
   const data = {
     firstName: firstName.value,
@@ -31,6 +34,6 @@ const formData = () => {
 };
 
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    formData();
-})
+  e.preventDefault();
+  formData();
+});
