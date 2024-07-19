@@ -5,8 +5,8 @@ console.log(form, typeof form);
 const formData = async () => {
   const { firstName, lastName, email, password, userName, confirmPassword } =
     form;
-  if (password !== confirmPassword) {
-    return error.log("Passwords do not match");
+  if (password.value !== confirmPassword.value) {
+    return console.log("Passwords do not match");
   }
 
   const data = {
