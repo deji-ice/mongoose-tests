@@ -2,11 +2,11 @@ const form = document.getElementById("signUpForm");
 
 console.log(form, typeof form);
 
-const formData = () => {
+const formData = async () => {
   const { firstName, lastName, email, password, userName, confirmPassword } =
     form;
-  if (password === confirmPassword) {
-    return alert("Passwords do not match");
+  if (password !== confirmPassword) {
+    return error.log("Passwords do not match");
   }
 
   const data = {
@@ -17,7 +17,7 @@ const formData = () => {
     password: password.value,
   };
 
-  fetch("http://localhost:3005/api/v1/user/register", {
+  await fetch("http://localhost:3005/api/v1/user/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
