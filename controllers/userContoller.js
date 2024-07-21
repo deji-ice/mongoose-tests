@@ -53,7 +53,7 @@ export const userLogin = async (req, res) => {
     if (!isCorrectPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ userId: user._id , }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
@@ -81,7 +81,31 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+export const updatePassword = async () => {
+  try {
+    const { userName } = req.params;
+    const { newPassword, oldPassword } = req.body;
 
+    if (newPassword === oldPassword)
+      res.status(400).json({
+        message: "new password cannot be the same as old password",
+      });
+
+    const user = await User.findOne({ userName });
+
+    user.password = newPassword;
+    user.save();
+
+    res.status(200).json({
+      message: "password updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "password could not be updated",
+      status: "error",
+    });
+  }
+};
 
 // export const accountLogin = async (req, res) => {
 //   try {
@@ -108,9 +132,9 @@ export const getAllUsers = async (req, res) => {
 //       res.status(200).json({
 //         status: "success",
 //         message: "Instructor logged in successfully",
-//       }); 
+//       });
 //     } else if (account ==="student"){
- 
+
 //     } else {
 //       return res.status(400).json({ message: "Invalid account type" });
 //     }
