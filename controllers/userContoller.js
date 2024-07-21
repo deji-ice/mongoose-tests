@@ -81,10 +81,11 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-export const updatePassword = async () => {
+export const updatePassword = async (req, res) => {
   try {
     const { userName } = req.params;
-    const { newPassword, oldPassword } = req.body;
+    console.log(userName);
+    let { newPassword, oldPassword } = req.body;
 
     if (newPassword === oldPassword)
       res.status(400).json({
@@ -92,6 +93,16 @@ export const updatePassword = async () => {
       });
 
     const user = await User.findOne({ userName });
+
+    const isOldPassword = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isOldPassword)
+      res.status(400).json({
+        message: "please input the correct old password",
+      });
+
+    const saltRounds = 10;
+    newPassword = await bcrypt.hash(newPassword, saltRounds);
 
     user.password = newPassword;
     user.save();
@@ -104,6 +115,25 @@ export const updatePassword = async () => {
       message: "password could not be updated",
       status: "error",
     });
+  }
+};
+
+export const updateUserName = async (req, res) => {
+  try {
+    const userName = req.params.userName;
+
+    const { newUserName } = req.body;
+
+    const user = await User.findOne({ userName });
+
+    user.userName = newUserName;
+
+    user.save();
+    res.status(200).json({
+      message: "userName updated successfully",
+    });
+  } catch (error) {
+    res.status(500).send("error updting username");
   }
 };
 
