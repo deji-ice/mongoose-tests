@@ -3,36 +3,33 @@ import * as OTPAuth from "otpauth";
 export const validateOTP = async (req, res, next) => {
   try {
     // Create a new TOTP object.
-    let totp = new OTPAuth.TOTP({
-      // Provider or service the account is associated with.
+    const { otp } = req.body;
+    const secret = "NB2W45DFOIZA"; // This should match the secret used for generating the OTP
+
+    // Create a TOTP object with the shared secret
+    const totp = new OTPAuth.TOTP({
       issuer: "ACME",
-      // Account identifier.
       label: "AzureDiamond",
-      // Algorithm used for the HMAC function.
       algorithm: "SHA1",
-      // Length of the generated tokens.
       digits: 6,
-      // Interval of time for which a token is valid, in seconds.
-      period: 120,
-      // Arbitrary key encoded in Base32 or OTPAuth.Secret instance.
-      secret: "NB2W45DFOIZA", // or 'OTPAuth.Secret.fromBase32("NB2W45DFOIZA")'
+      period: 120, // 120 seconds period 
+      secret: secret,
     });
 
-    const { otp } = req.body;
+  
     // Validate a token (returns the token delta or null if it is not found in the
     // search window, in which case it should be considered invalid).
-    let delta = totp.validate({ otp, window: 1 });
+    let delta = totp.validate({token:otp, window: 1 });
+
     if (delta === null) {
-      return res.status(400).json({
-        status: "error",
-        message: "Invalid OTP", 
-      });
-    }
-    return next();
+        res.status(401).json({ message: "Invalid OTP" });
+      } else {
+        // Proceed to the next middleware/controller if OTP is valid
+        next();
+      }
   } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: "An error occurred while trying to validate OTP",
-    });
+    next(error);
   }
 };
+
+
