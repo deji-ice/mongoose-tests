@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { OTPgenrator } from "../lib/OTPgenerator.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import crypto from "crypto";
 dotenv.config();
 
 export const createUser = async (req, res) => {
@@ -153,6 +154,8 @@ export const sendOTP = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
+
+    // const otp = await OTPgenrator(user._id, user.userName);
     const otp = await OTPgenrator();
 
     const transporter = nodemailer.createTransport({
@@ -168,7 +171,7 @@ export const sendOTP = async (req, res) => {
 
     const mailOptions = {
       from: '"Deji Ice PLC" <dejixice@gmail.com>', // sender address
-      to: "dejixice@yopmail.com", // list of receivers
+      to: user?.email, // list of receivers
       subject: "Password Reset", // Subject line
       text: `Your OTP code is ${otp}. It is valid for the next 30 seconds.`, // Plain text body
       html: `<p>Your OTP code is <b>${otp}</b>. It is valid for the next 30 seconds.</p>`, // HTML body
@@ -236,8 +239,9 @@ export const updatePasswordOTP = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-
-    user.password = newPassword;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    user.password = hashedPassword;
     user.save();
 
     res
