@@ -1,6 +1,10 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { OTPgenrator } from "../lib/OTPgenerator.js";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const createUser = async (req, res) => {
   try {
@@ -47,6 +51,7 @@ export const userLogin = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    7;
 
     //compare passwords
     const isCorrectPassword = await bcrypt.compare(password, user.password);
@@ -84,7 +89,6 @@ export const getAllUsers = async (req, res) => {
 export const updatePassword = async (req, res) => {
   try {
     const { userName } = req.params;
-    console.log(userName);
     let { newPassword, oldPassword } = req.body;
 
     if (newPassword === oldPassword)
@@ -93,6 +97,7 @@ export const updatePassword = async (req, res) => {
       });
 
     const user = await User.findOne({ userName });
+    if (!user) res.status(400).json({ message: "user not found" });
 
     const isOldPassword = await bcrypt.compare(oldPassword, user.password);
 
@@ -126,6 +131,8 @@ export const updateUserName = async (req, res) => {
 
     const user = await User.findOne({ userName });
 
+    if (!user) res.status(400).json({ message: "user not found" });
+
     user.userName = newUserName;
 
     user.save();
@@ -137,6 +144,111 @@ export const updateUserName = async (req, res) => {
   }
 };
 
+export const sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email)
+      return res.status(400).json({ message: "Please provide an email" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const otp = await OTPgenrator();
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "dejixice@gmail.com",
+        pass: process.env.GOOGLE_APP_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Deji Ice PLC" <dejixice@gmail.com>', // sender address
+      to: "dejixice@yopmail.com", // list of receivers
+      subject: "Password Reset", // Subject line
+      text: `Your OTP code is ${otp}. It is valid for the next 30 seconds.`, // Plain text body
+      html: `<p>Your OTP code is <b>${otp}</b>. It is valid for the next 30 seconds.</p>`, // HTML body
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email: ", error);
+      } else {
+        console.log("Email sent: ", info.response);
+        res.status(200).json({
+          message: "OTP sent successfully",
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while trying to send OTP",
+    });
+  }
+};
+
+export const login_otp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res
+        .status(400)
+        .json({ message: "Please provide an email and otp" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "User logged in successfully",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while trying to login with OTP",
+    });
+  }
+};
+
+export const updatePasswordOTP = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Please provide an email and new password" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    user.password = newPassword;
+    user.save();
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while trying to update password with OTP",
+    });
+  }
+};
 // export const accountLogin = async (req, res) => {
 //   try {
 //     const { account } = req.params;
