@@ -167,14 +167,70 @@ export const sendOTP = async (req, res) => {
         user: "dejixice@gmail.com",
         pass: process.env.GOOGLE_APP_PASSWORD,
       },
-    });
+    }); 
 
-    const mailOptions = {
+    const mailOptions = { 
       from: '"Deji Ice PLC" <dejixice@gmail.com>', // sender address
       to: user?.email, // list of receivers
       subject: "Password Reset", // Subject line
       text: `Your OTP code is ${otp}. It is valid for the next 30 seconds.`, // Plain text body
-      html: `<p>Your OTP code is <b>${otp}</b>. It is valid for the next 30 seconds.</p>`, // HTML body
+      html: `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 20px;
+            background-color: #f9f9f9;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .header h1 {
+            color: #4CAF50;
+            margin: 0;
+          }
+          .content {
+            font-size: 16px;
+            line-height: 1.5;
+          }
+          .otp {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d32f2f;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Password Reset</h1>
+          </div>
+          <div class="content">
+            <p>Your OTP code is <span class="otp">${otp}</span>. It is valid for the next 30 seconds.</p>
+          </div>
+          <div class="footer">
+            <p>Thank you for using Deji Ice PLC.</p>
+          </div>
+        </div>
+      </body>
+    </html>`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
