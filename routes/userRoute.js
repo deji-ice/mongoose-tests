@@ -11,11 +11,12 @@ import {
 } from "../controllers/userContoller.js";
 import { verifyJWToken } from "../middlewares/jwtAuth.js";
 import { validateOTP } from "../middlewares/validateOTP.js";
+import { authorize } from "../middlewares/authorizeRole.js";
 
 const router = express.Router();
 
-router.get("/all", verifyJWToken, getAllUsers);
-router.post("/register", createUser);
+router.get("/all", verifyJWToken,authorize(["staff", "admin"]), getAllUsers);
+router.post("/:role?/register", createUser);
 router.post("/login", userLogin);
 router.patch("/update-password/:userName", verifyJWToken, updatePassword);
 router.patch("/update-userName/:userName", verifyJWToken, updateUserName);
