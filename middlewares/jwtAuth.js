@@ -2,15 +2,17 @@ import jwt from "jsonwebtoken";
 
 //create jwt middleware to check secure authentification
 export const verifyJWToken = async (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized ☹️",
+    });
+  }
+
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({
-        status: "error",
-        message: "Unauthorized ☹️",
-      });
-    }
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+ 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     if (!decoded) {
       return res.status(401).json({
         status: "error",
