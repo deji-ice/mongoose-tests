@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import crypto from "crypto";
+import base32 from "hi-base32";
 
 const userSchema = new Schema({
   firstName: {
@@ -41,7 +42,9 @@ const userSchema = new Schema({
   secretKey: {
     type: String,
     default: function () {
-      return crypto.randomBytes(16).toString("hex");
+      const bytes = crypto.randomBytes(16);
+      // Convert bytes to Base32
+      return base32.encode(bytes).toUpperCase();
     },
   },
 });
