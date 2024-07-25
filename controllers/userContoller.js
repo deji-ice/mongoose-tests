@@ -4,12 +4,12 @@ import jwt from "jsonwebtoken";
 import { OTPgenrator } from "../lib/OTPgenerator.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import crypto from "crypto";
 dotenv.config();
 
 export const createUser = async (req, res) => {
   try {
     const { userName, password } = req.body;
+    const { role } = req.params;
     const user = new User(req.body);
 
     // Check If User Exists In The Database
@@ -22,12 +22,22 @@ export const createUser = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     user.password = hashedPassword;
+    if (role === "admin" || role === "staff" || role === "user") {
+      user.role = role;
 
-    await user.save();
-    res.status(201).json({
-      status: "success",
-      message: "User created successfully",
-    });
+      await user.save();
+      res.status(201).json({
+        status: "success",
+        message: `${user.role} created successfully`,
+      });
+    } else {
+      user.role = "user";
+      await user.save();
+      res.status(200).json({
+        status: "success",
+        message: `role not specified, user created as ${user.role}`,
+      });
+    }
   } catch (error) {
     res.status(500).json({
       status: "error",
@@ -59,13 +69,17 @@ export const userLogin = async (req, res) => {
     if (!isCorrectPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res.status(200).json({
       status: "success",
-      message: "User logged in successfully",
+      message: `${user.role} logged in successfully`,
       token,
     });
   } catch (err) {
@@ -82,7 +96,6 @@ export const getAllUsers = async (req, res) => {
     const users = await User.find({}, { password: 0 }); // Exclude the password field from the response
     return res.status(200).json({ users });
   } catch (error) {
-    console.log(error.message);
     return res.status(500).json({ message: "Error fetching users" });
   }
 };
@@ -154,10 +167,8 @@ export const sendOTP = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-
     // const otp = await OTPgenrator(user._id, user.userName);
-    const otp = await OTPgenrator();
-
+    const otp = await OTPgenrator(user.secretKey);
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       host: "smtp.gmail.com",
@@ -167,9 +178,9 @@ export const sendOTP = async (req, res) => {
         user: "dejixice@gmail.com",
         pass: process.env.GOOGLE_APP_PASSWORD,
       },
-    }); 
+    });
 
-    const mailOptions = { 
+    const mailOptions = {
       from: '"Deji Ice PLC" <dejixice@gmail.com>', // sender address
       to: user?.email, // list of receivers
       subject: "Password Reset", // Subject line
@@ -230,14 +241,15 @@ export const sendOTP = async (req, res) => {
           </div>
         </div>
       </body>
-    </html>`
+    </html>`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error("Error sending email: ", error);
+        res
+          .status(500)
+          .json({ message: "An error occurred while trying to send OTP" });
       } else {
-        console.log("Email sent: ", info.response);
         res.status(200).json({
           message: "OTP sent successfully",
         });
