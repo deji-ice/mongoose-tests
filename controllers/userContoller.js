@@ -4,10 +4,7 @@ import jwt from "jsonwebtoken";
 import { OTPgenrator } from "../lib/OTPgenerator.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import cors from "cors";
 dotenv.config();
-
-app.use(cors());
 
 export const createUser = async (req, res) => {
   try {
