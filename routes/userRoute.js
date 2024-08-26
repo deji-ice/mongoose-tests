@@ -15,7 +15,7 @@ import { authorize } from "../middlewares/authorizeRole.js";
 
 const router = express.Router();
 
-router.get("/all", verifyJWToken,authorize(["staff", "admin"]), getAllUsers);
+// router.get("/all", verifyJWToken,authorize(["staff", "admin"]), getAllUsers);
 router.post("/:role?/register", createUser);
 router.post("/login", userLogin);
 router.patch("/update-password/:userName", verifyJWToken, updatePassword);

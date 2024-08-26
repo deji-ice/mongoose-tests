@@ -5,6 +5,9 @@ import { OTPgenrator } from "../lib/OTPgenerator.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
+const cors = require("cors");
+
+app.use(cors());
 
 export const createUser = async (req, res) => {
   try {
@@ -47,6 +50,8 @@ export const createUser = async (req, res) => {
 };
 
 export const userLogin = async (req, res) => {
+
+
   try {
     const { userName, password } = req.body;
 
